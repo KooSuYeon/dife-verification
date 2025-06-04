@@ -23,10 +23,10 @@ jobs:
       - name: Create .env file
         run: |
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" > .env
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" > .env
-          echo "AWS_REGION=${{ secrets.AWS_REGION }}" > .env
-          echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" > .env
-          echo "S3_IMAGE_KEY=${{ secrets.S3_IMAGE_KEY }}" > .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
+          echo "S3_IMAGE_KEY=${{ secrets.S3_IMAGE_KEY }}" >> .env
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
 
       - name: Upload github directory to EC2
