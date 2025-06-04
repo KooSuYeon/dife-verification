@@ -22,7 +22,6 @@ jobs:
 
       - name: Create .env file
         run: |
-          mkdir -p ai
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" > .env
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" > .env
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" > .env
@@ -36,7 +35,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.AWS_EC2_SSH_KEY }}
           source: "."
-          target: "/home/ubuntu"
+          target: "/home/ec2-user"
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -45,6 +44,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.AWS_EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu
+            cd /home/ec2-user
             docker-compose down -v   
             docker-compose up -d --build 
