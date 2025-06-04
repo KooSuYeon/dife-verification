@@ -3,8 +3,6 @@ name: Dife Auto Verification CI/CD Pipeline
 on:
   push:
     branches: ["main"]
-    paths:
-      - 'dife_verification/**'
 
 jobs:
   deploy:
