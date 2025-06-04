@@ -13,5 +13,6 @@ services:
       - AWS_REGION
       - S3_BUCKET_NAME
       - S3_IMAGE_KEY
+      - HF_TOKEN
     volumes:
       - ./:/app
