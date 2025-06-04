@@ -14,4 +14,4 @@ RUN pip install git+https://github.com/openai/CLIP.git
 COPY . .
 EXPOSE 8000
 
-CMD ["uvicorn", "verify:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "verify:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
