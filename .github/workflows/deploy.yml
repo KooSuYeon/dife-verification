@@ -32,18 +32,18 @@ jobs:
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.AWS_EC2_HOST }}
-          username: ec2-user
+          username: ubuntu
           key: ${{ secrets.AWS_EC2_SSH_KEY }}
           source: "."
-          target: "/home/ec2-user"
+          target: "/home/ubuntu"
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.AWS_EC2_HOST }}
-          username: ec2-user
+          username: ubuntu
           key: ${{ secrets.AWS_EC2_SSH_KEY }}
           script: |
-            cd /home/ec2-user
+            cd /home/ubuntu
             docker-compose down -v   
             docker-compose up -d --build 
