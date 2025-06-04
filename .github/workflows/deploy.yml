@@ -33,7 +33,7 @@ jobs:
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.AWS_EC2_HOST }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.AWS_EC2_SSH_KEY }}
           source: "."
           target: "/home/ubuntu"
