@@ -27,6 +27,7 @@ jobs:
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" > .env
           echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" > .env
           echo "S3_IMAGE_KEY=${{ secrets.S3_IMAGE_KEY }}" > .env
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
 
       - name: Upload github directory to EC2
         uses: appleboy/scp-action@v0.1.3
