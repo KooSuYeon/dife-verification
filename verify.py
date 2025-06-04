@@ -1,15 +1,11 @@
-import os
-import io
-import torch
-import boto3
-import asyncio
-from PIL import Image
-from dotenv import load_dotenv
-from transformers import CLIPProcessor, CLIPModel
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import JSONResponse
-import easyocr
-import numpy as np
+from transformers import CLIPProcessor, CLIPModel
+from PIL import Image
+import torch, io, asyncio, easyocr, numpy as np
+import os
+import boto3
+from dotenv import load_dotenv
 
 load_dotenv()
 hf_token = os.getenv("HF_TOKEN")
@@ -59,35 +55,38 @@ def get_embedding(image: Image.Image):
 @app.on_event("startup")
 async def startup_event():
     global reference_embedding
-    try:
-        img = await asyncio.to_thread(load_image_from_s3, S3_BUCKET_NAME, S3_IMAGE_KEY)
-        reference_embedding = get_embedding(img)
-    except Exception as e:
-        print(f"❌ {e}")
+    img = await asyncio.to_thread(load_image_from_s3, S3_BUCKET_NAME, S3_IMAGE_KEY)
+    reference_embedding = await asyncio.to_thread(get_embedding, img)
 
 @app.post("/check_similarity/")
 async def check_similarity(file: UploadFile = File(...)):
+    global reference_embedding
     if reference_embedding is None:
         return JSONResponse({"error": "Reference image not loaded"}, status_code=500)
 
     img_bytes = await file.read()
     img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-    
 
-    emb = get_embedding(img)
+    emb = await asyncio.to_thread(get_embedding, img)
     similarity = torch.cosine_similarity(reference_embedding, emb, dim=0).item()
 
+    def run_ocr(cropped_img_np):
+        reader = easyocr.Reader(['ko', 'en'], gpu=False)
+        return reader.readtext(cropped_img_np, detail=0)
+
     width, height = img.size
-    cropped = img.crop((0, 0, width, height // 3))  
-    ocr_result = reader.readtext(np.array(cropped), detail=0)
+    cropped = img.crop((0, 0, width, height // 3))
+    cropped_np = np.array(cropped)
+
+    ocr_result = await asyncio.to_thread(run_ocr, cropped_np)
     text_result = " ".join(ocr_result)
 
     keywords = ["국민", "Kookmin", "國民"]
     contains_keyword = any(keyword in text_result for keyword in keywords)
-    
+
     if contains_keyword:
-        similarity += 0 
-        similarity = min(similarity, 1.0)  
+        similarity += 0
+        similarity = min(similarity, 1.0)
 
     is_similar = similarity > 0.77
 
@@ -97,5 +96,3 @@ async def check_similarity(file: UploadFile = File(...)):
         "ocr_text": text_result,
         "keyword_detected": contains_keyword
     })
-
-
