@@ -8,6 +8,8 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
+import asyncio
+
 
 load_dotenv()
 
@@ -48,8 +50,10 @@ def load_image_from_s3(bucket: str, key: str) -> Image.Image:
 @app.on_event("startup")
 async def startup_event():
     global img1_embedding
-    img1 = load_image_from_s3(S3_BUCKET_NAME, S3_IMAGE_KEY)
-    img1_embedding = get_clip_embedding_pil(img1)
+    print("🚀 Starting up, loading image from S3...")
+    img1 = await asyncio.to_thread(load_image_from_s3, S3_BUCKET_NAME, S3_IMAGE_KEY)
+    img1_embedding = await asyncio.to_thread(get_clip_embedding_pil, img1)
+    print("✅ Startup complete")
 
 @app.post("/check_similarity/")
 async def check_similarity(file: UploadFile = File(...)):
