@@ -6,6 +6,7 @@ import torch, io, asyncio, easyocr, numpy as np
 import os
 import boto3
 from dotenv import load_dotenv
+import tempfile
 
 load_dotenv()
 hf_token = os.getenv("HF_TOKEN")
@@ -36,6 +37,15 @@ s3_client = boto3.client(
 )
 
 reference_embedding = None  
+
+def write_temp_file(content: str, suffix: str) -> str:
+    tf = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    tf.write(content.encode())
+    tf.close()
+    return tf.name
+
+crt_path = write_temp_file(os.getenv("FASTAPI_TLS_CRT", ""), ".crt")
+key_path = write_temp_file(os.getenv("FASTAPI_TLS_KEY", ""), ".key")
 
 def load_image_from_s3(bucket: str, key: str) -> Image.Image:
     response = s3_client.get_object(Bucket=bucket, Key=key)

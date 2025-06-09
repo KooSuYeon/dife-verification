@@ -28,6 +28,8 @@ jobs:
           echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
           echo "S3_IMAGE_KEY=${{ secrets.S3_IMAGE_KEY }}" >> .env
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
+          echo "FASTAPI_TLS_CRT=\"${{ secrets.FASTAPI_TLS_CRT }}\"" >> .env  
+          echo "FASTAPI_TLS_KEY=\"${{ secrets.FASTAPI_TLS_KEY }}\"" >> .env
 
       - name: Upload github directory to EC2
         uses: appleboy/scp-action@v0.1.3

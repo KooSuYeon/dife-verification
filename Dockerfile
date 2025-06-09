@@ -22,4 +22,4 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY . .
 
 EXPOSE 8000
-CMD ["uvicorn", "verify:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./start.sh"]
