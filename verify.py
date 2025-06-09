@@ -70,6 +70,8 @@ async def check_similarity(file: UploadFile = File(...)):
     emb = await asyncio.to_thread(get_embedding, img)
     similarity = torch.cosine_similarity(reference_embedding, emb, dim=0).item()
 
+    print(f"[INFO] Cosine Similarity: {similarity:.4f}")
+
     def run_ocr(cropped_img_np):
         reader = easyocr.Reader(['ko', 'en'], gpu=False)
         return reader.readtext(cropped_img_np, detail=0)
@@ -89,6 +91,9 @@ async def check_similarity(file: UploadFile = File(...)):
         similarity = min(similarity, 1.0)
 
     is_similar = similarity > 0.77
+
+    print(f"[INFO] OCR Text: {text_result}")
+    print(f"[INFO] Keyword Detected: {contains_keyword}")
 
     return JSONResponse({
         "similarity": round(similarity, 4),
